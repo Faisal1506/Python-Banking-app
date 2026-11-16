@@ -1,6 +1,7 @@
 import json
 import os
 from datetime import datetime
+import math
 
 filename1 = "userInfo.json"
 filename2 = "userLog.json"
@@ -33,13 +34,23 @@ def add_log(username, action, amount, recipient=None):
     user_log[username].append(entry)
     save(filename2, user_log)
 
+
+def get_amount(prompt):
+    try:
+        amount = round(float(input(prompt)), 2)
+    except ValueError:
+        print("Enter a Valid Amount")
+        return None
+    if not math.isfinite(amount) or amount <=0:
+        print("Enter a Valid Amount")
+        return None
+    return amount
+
 def deposit():
     global username
     balance = users[username]["balance"]
-    try:
-        amount = round(float(input("How much would you like to deposit: £")),2)
-    except ValueError:
-        print("Enter a valid number")
+    amount = get_amount("How much would you like to deposit: £")
+    if amount is None:
         return
     if amount <= 0:
         print("Enter a valid number")
@@ -54,10 +65,8 @@ def deposit():
 def withdraw():
     global username
     balance = users[username]["balance"]
-    try:
-        amount = round(float(input("How much would you like to withdraw: £")),2)
-    except ValueError:
-        print("Enter a valid number")
+    amount = get_amount("How much would you like to deposit: £")
+    if amount is None:
         return
     if amount<=0:
         print("Enter a valid amount")
@@ -82,10 +91,8 @@ def send_money():
     if user_send == username:
         print("Can't send money to Yourself")
         return
-    try:
-        amount = round(float(input(f"Amount you're sending to {user_send}: £")),2)
-    except ValueError:
-        print("Invalid Amount")
+    amount = get_amount("How much would you like to deposit: £")
+    if amount is None:
         return
     if amount > balance:
         print("Balance too low")
