@@ -59,6 +59,8 @@ def withdraw():
     except ValueError:
         print("Enter a valid number")
         return
+    if amount<=0:
+        print("Enter a valid amount")
     if amount > balance:
         print("Balance too low")
         return
