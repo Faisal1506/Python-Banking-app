@@ -61,6 +61,7 @@ def withdraw():
         return
     if amount<=0:
         print("Enter a valid amount")
+        return
     if amount > balance:
         print("Balance too low")
         return
