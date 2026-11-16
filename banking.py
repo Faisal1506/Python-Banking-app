@@ -65,11 +65,8 @@ def deposit():
 def withdraw():
     global username
     balance = users[username]["balance"]
-    amount = get_amount("How much would you like to deposit: £")
+    amount = get_amount("How much would you like to withdraw: £")
     if amount is None:
-        return
-    if amount<=0:
-        print("Enter a valid amount")
         return
     if amount > balance:
         print("Balance too low")
@@ -91,14 +88,11 @@ def send_money():
     if user_send == username:
         print("Can't send money to Yourself")
         return
-    amount = get_amount("How much would you like to deposit: £")
+    amount = get_amount("How much would you like to send £")
     if amount is None:
         return
     if amount > balance:
         print("Balance too low")
-        return
-    if amount <= 0:
-        print("Enter a valid amount")
         return
     while True:
         press = input(f"You're sending £{amount:.2f} to {user_send}. Press N to go back or Y to confirm: ").lower()
