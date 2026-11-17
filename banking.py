@@ -2,6 +2,9 @@ import json
 import os
 from datetime import datetime
 import math
+import hashlib
+import hmac
+from getpass import getpass
 
 filename1 = "userInfo.json"
 filename2 = "userLog.json"
@@ -34,6 +37,17 @@ def add_log(username, action, amount, recipient=None):
     user_log[username].append(entry)
     save(filename2, user_log)
 
+def hashpassword(password, salt=None):
+    if salt is None:
+        salt = os.urandom(16)
+    hashed = hashlib.pbkdf2_hmac("sha256", password.encode(), salt, 600_000)
+    return salt.hex(), hashed.hex()
+
+
+def check_password(password, salt_hex, hash_hex):
+    _, new_hash = hashpassword(password, bytes.fromhex(salt_hex))
+    return hmac.compare_digest(new_hash, hash_hex)
+
 
 def get_amount(prompt):
     try:
@@ -51,9 +65,6 @@ def deposit():
     balance = users[username]["balance"]
     amount = get_amount("How much would you like to deposit: £")
     if amount is None:
-        return
-    if amount <= 0:
-        print("Enter a valid number")
         return
     balance += amount
     users[username]["balance"] = balance
@@ -88,7 +99,7 @@ def send_money():
     if user_send == username:
         print("Can't send money to Yourself")
         return
-    amount = get_amount("How much would you like to send £")
+    amount = get_amount("How much would you like to send: £")
     if amount is None:
         return
     if amount > balance:
@@ -119,8 +130,8 @@ while True:
 
     if pick == "1":
         username = input("Enter Username: ")
-        password = input("Enter Password: ")
-        if username in users and users[username]["password"] == password:
+        password = getpass("Enter Password: ")
+        if username in users and check_password(password, users[username]["salt"], users[username]["password_hash"]):
             print(f"Welcome {username}")
             while True:
                 balance = users[username]["balance"]
@@ -155,8 +166,8 @@ while True:
                         print("No transactions yet.")
                 else:
                     print("Invalid option")
-        else:
-            print("Username or Password invalid")
+            else:
+                print("Username or Password invalid")
 
     elif pick == "2":
         while True:
@@ -167,12 +178,14 @@ while True:
                 while True:
                     password = input("Enter password: ")
                     if len(password) < 6:
-                        print("Password has to be greater than 6 characters")
+                        print("Password must be at least 6 characters")
                     else:
+                        salt, password_hash = hashpassword(password)
                         users[username] = {
-                            "password": password,
-                            "balance": 0.00
-                        }
+                            "salt": salt,
+                            "password_hash": password_hash,
+                            "balance": 0.0
+                            }
                         print(f"{username} Created Successfully")
                         save(filename1, users)
                         break
