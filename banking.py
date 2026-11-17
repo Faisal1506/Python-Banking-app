@@ -60,8 +60,7 @@ def get_amount(prompt):
         return None
     return amount
 
-def deposit():
-    global username
+def deposit(username):
     balance = users[username]["balance"]
     amount = get_amount("How much would you like to deposit: £")
     if amount is None:
@@ -73,8 +72,7 @@ def deposit():
     print(f"£{amount} has been deposited")
     print(f"New balance: £{balance:.2f}")
 
-def withdraw():
-    global username
+def withdraw(username):
     balance = users[username]["balance"]
     amount = get_amount("How much would you like to withdraw: £")
     if amount is None:
@@ -89,8 +87,7 @@ def withdraw():
     print(f"£{amount} has been withdrawn")
     print(f"New balance: £{balance:.2f}")
 
-def send_money():
-    global username
+def send_money(username):
     balance = users[username]["balance"]
     user_send = input("Enter Username: ")
     if user_send not in users:
@@ -122,78 +119,86 @@ def send_money():
         else:
             print("Invalid Option")
 
-while True:
-    print("1. Login")
-    print("2. Register")
-    print("3. EXIT")
-    pick = input("Enter 1, 2 Or 3: ")
+def show_history(username):
+    entries = user_log.get(username, [])
+    if not entries:
+        print("No transactions yet")
+        return
+    for entry in entries:
+        line = f"{entry['timestamp']}: {entry['action']} £{entry['amount']:.2f}"
+        if "recipient" in entry:
+            line += f"->{entry['recipient']}"
+        print(line)
 
-    if pick == "1":
-        username = input("Enter Username: ")
-        password = getpass("Enter Password: ")
-        if username in users and check_password(password, users[username]["salt"], users[username]["password_hash"]):
-            print(f"Welcome {username}")
-            while True:
-                balance = users[username]["balance"]
-                print(f"Balance: £{balance:.2f}")
-                print("1. Deposit")
-                print("2. Withdraw")
-                print("3. Send Money")
-                print("4. Logout")
-                print("5. View Transaction History")
-                atm_choice = input("Your choice: ")
-                if atm_choice == "1":
-                    deposit()
-                elif atm_choice == "2":
-                    withdraw()
-                elif atm_choice == "3":
-                    send_money()
-                elif atm_choice == "4":
-                    print("Logging out...")
-                    break
-                elif atm_choice == "5":
-                    if username in user_log and user_log[username]:
-                        for entry in user_log[username]:
-                            action = entry["action"]
-                            amount = entry["amount"]
-                            timestamp = entry["timestamp"]
-                            recipient = entry.get("recipient", "")
-                            if recipient:
-                                print(f"{timestamp}: {action} £{amount:.2f} -> {recipient}")
-                            else:
-                                print(f"{timestamp}: {action} £{amount:.2f}")
-                    else:
-                        print("No transactions yet.")
-                else:
-                    print("Invalid option")
-            else:
-                print("Username or Password invalid")
+def account_menu(username):
+    print(f"Welcome {username}!")
+    while True:
+        print(f"Balance: £{users[username]['balance']:.2f}")
+        print("1.Deposit")
+        print("2.Withdraw")
+        print("3.Send Money")
+        print("4.Logout")
+        print("5.View Transaction History")
+        choice = input("Your choice: ")
+        if choice == "1":
+            deposit(username)
+        elif choice == "2":
+            withdraw(username)
+        elif choice == "3":
+            send_money(username)
+        elif choice == "4":
+            print("Logging out...")
+            return
+        elif choice == "5":
+            show_history(username)
+        else:
+            print("Invalid Option")
 
-    elif pick == "2":
-        while True:
-            username = input("Enter Username: ")
-            if username in users:
-                print("Username Taken")
-            else:
-                while True:
-                    password = input("Enter password: ")
-                    if len(password) < 6:
-                        print("Password must be at least 6 characters")
-                    else:
-                        salt, password_hash = hashpassword(password)
-                        users[username] = {
-                            "salt": salt,
-                            "password_hash": password_hash,
-                            "balance": 0.0
-                            }
-                        print(f"{username} Created Successfully")
-                        save(filename1, users)
-                        break
-                break
-
-    elif pick == "3":
-        print("Closing...")
-        exit()
-
+def login():
+    username = input("Enter Username: ")
+    password = getpass("Enter Password: ")
+    if username in users and check_password(password, users[username]["salt"], users[username]["password_hash"]):
+        account_menu(username)
     else:
-        print("Invalid option")
+        print("Username or Password Invalid")
+
+def register():
+    while True:
+        username = input("Enter Username: ")
+        if username in users:
+            print("Username Taken")
+        else:
+            while True:
+                password = input("Enter password: ")
+                if len(password) < 6:
+                    print("Password must be at least 6 characters")
+                else:
+                    break
+            salt, password_hash = hashpassword(password)
+            users[username] = {
+                "salt": salt,
+                "password_hash": password_hash,
+                "balance": 0.0
+                }
+            save(filename1, users)
+            print(f"{username} Created Successfully")
+            return
+
+def main():
+    while True:
+        print("1.Login")
+        print("2.Register")
+        print("3.Exit")
+        pick = input("Your Choice: ")
+        if pick == "1":
+            login()
+        elif pick == "2":
+            register()
+        elif pick == "3":
+            print("Closing...")
+            return
+        else:
+            print("Invalid Option")
+
+if __name__ == "__main__":
+    main()
