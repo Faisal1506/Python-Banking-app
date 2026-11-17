@@ -69,7 +69,7 @@ def deposit(username):
     users[username]["balance"] = balance
     save(filename1, users)
     add_log(username, "deposit", amount)
-    print(f"£{amount} has been deposited")
+    print(f"£{amount:.2f} has been deposited")
     print(f"New balance: £{balance:.2f}")
 
 def withdraw(username):
@@ -84,7 +84,7 @@ def withdraw(username):
     users[username]["balance"] = balance
     save(filename1, users)
     add_log(username, "withdraw", amount)
-    print(f"£{amount} has been withdrawn")
+    print(f"£{amount:.2f} has been withdrawn")
     print(f"New balance: £{balance:.2f}")
 
 def send_money(username):
@@ -127,7 +127,7 @@ def show_history(username):
     for entry in entries:
         line = f"{entry['timestamp']}: {entry['action']} £{entry['amount']:.2f}"
         if "recipient" in entry:
-            line += f"->{entry['recipient']}"
+            line += f" -> {entry['recipient']}"
         print(line)
 
 def account_menu(username):
