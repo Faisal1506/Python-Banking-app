@@ -1,5 +1,4 @@
 # Python-Banking-app
-# Python Banking App
 
 A multi-user command-line banking application written in Python. Users can register, log in, deposit, withdraw, send money to each other and view their transaction history.
 
@@ -22,8 +21,8 @@ A multi-user command-line banking application written in Python. Users can regis
 Requires **Python 3.6+**. No external packages are needed.
 
 ```bash
-git clone https://github.com/Faisal1506/Python-Banking-App.git
-cd Python-Banking-App
+git clone https://github.com/Faisal1506/Python-Banking-app.git
+cd Python-Banking-app
 python banking.py
 ```
 
@@ -32,15 +31,19 @@ python banking.py
 ## Example
 
 ```
-1. Login
-2. Register
-3. EXIT
-Enter 1, 2 Or 3: 1
+1.Login
+2.Register
+3.Exit
+Your Choice: 1
 Enter Username: alice
 Enter Password:
-Welcome alice
+Welcome alice!
 Balance: £52.00
-...
+1.Deposit
+2.Withdraw
+3.Send Money
+4.Logout
+5.View Transaction History
 Your choice: 5
 2026-11-17 09:38:08: deposit £50.00
 2026-11-17 09:38:08: deposit £5.00
